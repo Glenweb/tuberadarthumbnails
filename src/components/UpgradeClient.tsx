@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { api, type MeResponse } from "@/lib/client";
-import { Banner, PageHeader, Section, Spinner, Stat } from "@/components/ui";
+import { Banner, PageHeader, Section, Skeleton, Spinner, Stat, StatSkeleton } from "@/components/ui";
 
 export function UpgradeClient() {
   const [me, setMe] = useState<MeResponse | null>(null);
@@ -48,7 +48,14 @@ export function UpgradeClient() {
       {message && <div className="mb-4"><Banner tone="good" onDismiss={() => setMessage(null)}>{message}</Banner></div>}
 
       {!me ? (
-        <div className="flex items-center gap-2 text-[13px] text-ink-400"><Spinner /> Loading…</div>
+        <>
+          <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[0, 1, 2, 3].map((i) => <StatSkeleton key={i} />)}
+          </div>
+          <div className="grid gap-4 lg:grid-cols-4">
+            {[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-[420px]" />)}
+          </div>
+        </>
       ) : (
         <>
           <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -60,7 +67,7 @@ export function UpgradeClient() {
               tone={me.user.creditsRemaining / me.plan.credits > 0.35 ? "good" : me.user.creditsRemaining / me.plan.credits > 0.12 ? "warn" : "bad"}
             />
             <Stat label="Used this period" value={used.toLocaleString()} hint={`Period started ${new Date(me.user.periodStart).toLocaleDateString("en-GB")}`} />
-            <Stat label="Saved winners" value={me.stats.winners} hint={`${me.stats.scores} scores run`} />
+            <Stat label="Saved winners" value={me.stats.winners} hint={`${me.stats.scores} ${me.stats.scores === 1 ? "pair" : "pairs"} scored`} />
           </div>
 
           {!me.capabilities.billing && (

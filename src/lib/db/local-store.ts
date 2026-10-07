@@ -28,9 +28,18 @@ export class LocalStore implements Store {
   private ready: Promise<void>;
 
   constructor() {
-    this.ready = fs
-      .mkdir(BLOB_DIR, { recursive: true })
-      .then(() => undefined);
+    this.ready = this.ensureDirs();
+  }
+
+  /**
+   * Idempotent directory creation, run before every write rather than once at
+   * construction. `mkdir -p` on an existing directory is a cheap no-op, and
+   * doing it per-write makes the store self-healing: if `.data` is deleted
+   * underneath a running process (a cleanup script, a stale container volume)
+   * the next write recreates it instead of failing with ENOENT forever.
+   */
+  private async ensureDirs() {
+    await fs.mkdir(BLOB_DIR, { recursive: true });
   }
 
   private file(table: string) {
@@ -59,6 +68,9 @@ export class LocalStore implements Store {
       this.cache.set(table, rows);
       return rows;
     } catch {
+      // No file yet, or it was removed underneath us. Either way the truth is
+      // "empty" — caching a stale row set here would hand out ids whose blobs
+      // are gone.
       this.cache.set(table, []);
       return [];
     }
@@ -66,6 +78,7 @@ export class LocalStore implements Store {
 
   private async write<T extends TableName>(table: T, rows: Row<T>[]) {
     this.cache.set(table, rows);
+    await this.ensureDirs();
     const target = this.file(table);
     const tmp = `${target}.${process.pid}.${Date.now()}.tmp`;
     await fs.writeFile(tmp, JSON.stringify(rows, null, 2), "utf8");
@@ -163,7 +176,7 @@ export class LocalStore implements Store {
   }
 
   async putBlob(key: string, data: Buffer, _mime: string): Promise<string> {
-    await this.ready;
+    await this.ensureDirs();
     await fs.writeFile(this.blobPath(key), data);
     return key;
   }

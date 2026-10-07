@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { PairScore } from "@/lib/db/types";
 import { api, type MeResponse } from "@/lib/client";
-import { Banner, Empty, PageHeader, Section, Spinner, Stat } from "@/components/ui";
+import { Banner, Empty, PageHeader, Section, Skeleton, Stat, StatSkeleton } from "@/components/ui";
 import { scoreColour } from "@/components/score/ScoreVisuals";
 
 const ACTIONS = [
@@ -77,7 +77,15 @@ export function OverviewClient() {
       </div>
 
       {!me ? (
-        <div className="flex items-center gap-2 text-[13px] text-ink-400"><Spinner /> Loading your workspace…</div>
+        <>
+          <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[0, 1, 2, 3].map((i) => <StatSkeleton key={i} />)}
+          </div>
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
+            <Skeleton className="h-[260px]" />
+            <Skeleton className="h-[260px]" />
+          </div>
+        </>
       ) : (
         <>
           <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -105,10 +113,11 @@ export function OverviewClient() {
                       </span>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-[12.5px] font-semibold">
-                          {s.pillars.find((p) => p.key === "title")?.items.find((i) => i.key === "length")?.value ?? "Scored pair"}
+                          {s.title_text || s.variant_label || "Scored pair"}
                         </p>
                         <p className="mt-0.5 text-[11px] text-ink-400">
                           Grade {s.grade}
+                          {s.keyword ? ` · "${s.keyword}"` : ""}
                           {s.shelf ? ` · would rank #${s.shelf.rank} of ${s.shelf.outOf}` : " · no shelf loaded"}
                           {` · ${new Date(s.created_at).toLocaleDateString("en-GB")}`}
                         </p>

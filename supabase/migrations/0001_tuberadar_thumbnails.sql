@@ -168,6 +168,11 @@ create table if not exists public.trt_pair_scores (
   title_variant_id  uuid        references public.trt_title_variants (id) on delete set null,
   source_video_id   uuid        references public.trt_source_videos (id) on delete set null,
   shelf_id          uuid        references public.trt_competitor_shelves (id) on delete set null,
+  -- What was actually scored. A score row without these says nothing about
+  -- what produced it, which makes the history useless for comparison.
+  title_text        text        not null default '',
+  variant_label     text,
+  keyword           text,
   trc               numeric(5,2) not null check (trc >= 0 and trc <= 100),
   grade             text        not null check (grade in ('S','A','B','C','D')),
   pillars           jsonb       not null,

@@ -315,6 +315,13 @@ export type PairScore = {
   title_variant_id: ID | null;
   source_video_id: ID | null;
   shelf_id: ID | null;
+  /** The title that was scored. Without it a score row says nothing about
+   *  what produced it, which makes the history useless for comparison. */
+  title_text: string;
+  /** Label of the thumbnail that was scored. */
+  variant_label: string | null;
+  /** Keyword the shelf was built for. */
+  keyword: string | null;
   /** The headline 0-100 TubeRadar Click Index. */
   trc: number;
   grade: "S" | "A" | "B" | "C" | "D";

@@ -93,6 +93,22 @@ export function Stat({
   );
 }
 
+/** Placeholder that holds the real layout while data loads, so the page does
+ *  not collapse to a single spinner line and then jump. */
+export function Skeleton({ className = "", rounded = "rounded-[13px]" }: { className?: string; rounded?: string }) {
+  return <div className={`shimmer ${rounded} ${className}`} aria-hidden />;
+}
+
+export function StatSkeleton() {
+  return (
+    <div className="panel-tight p-3.5">
+      <Skeleton className="h-2.5 w-20" rounded="rounded-full" />
+      <Skeleton className="mt-2.5 h-5 w-16" rounded="rounded-[5px]" />
+      <Skeleton className="mt-2.5 h-2 w-28" rounded="rounded-full" />
+    </div>
+  );
+}
+
 export function Empty({ title, children, action }: { title: string; children?: ReactNode; action?: ReactNode }) {
   return (
     <div className="rounded-[13px] border border-dashed border-ink-600 px-6 py-12 text-center">
@@ -109,12 +125,18 @@ export function ThumbPreview({
 }: {
   src: string | null; alt: string; title?: string; channel?: string; shelfSize?: boolean; className?: string;
 }) {
+  // An asset that 404s (pruned storage, a stale row) degrades to the
+  // placeholder rather than a broken-image icon.
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [src]);
+  const usable = src && !failed ? src : null;
+
   if (shelfSize) {
     return (
       <div className={`w-[168px] shrink-0 ${className}`}>
-        {src ? (
+        {usable ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={src} alt={alt} width={168} height={94} className="thumb w-[168px] h-[94px] rounded-[7px]" />
+          <img src={usable} alt={alt} width={168} height={94} onError={() => setFailed(true)} className="thumb w-[168px] h-[94px] rounded-[7px]" />
         ) : (
           <div className="thumb w-[168px] h-[94px] rounded-[7px] shimmer" />
         )}
@@ -127,9 +149,9 @@ export function ThumbPreview({
       </div>
     );
   }
-  return src ? (
+  return usable ? (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt={alt} className={`thumb w-full rounded-[11px] ${className}`} />
+    <img src={usable} alt={alt} onError={() => setFailed(true)} className={`thumb w-full rounded-[11px] ${className}`} />
   ) : (
     <div className={`thumb w-full rounded-[11px] shimmer ${className}`} />
   );

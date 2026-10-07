@@ -29,7 +29,10 @@ export type ScoreInput = {
 
 export type ScoreResult = Omit<
   PairScore,
-  "id" | "user_id" | "variant_id" | "title_variant_id" | "source_video_id" | "shelf_id" | "critique"
+  | "id" | "user_id" | "variant_id" | "title_variant_id" | "source_video_id"
+  | "shelf_id" | "critique"
+  // Provenance is attached by the service layer, not the pure engine.
+  | "title_text" | "variant_label" | "keyword"
 > & {
   /** The rival most likely to be confused with this thumbnail. */
   twin: CompetitorVideo | null;

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { api, type WinnersResponse } from "@/lib/client";
-import { Banner, CopyButton, Empty, PageHeader, Section, Spinner, Stat, ThumbPreview } from "@/components/ui";
+import { Banner, CopyButton, Empty, PageHeader, Section, Skeleton, Spinner, Stat, StatSkeleton, ThumbPreview } from "@/components/ui";
 import { scoreColour } from "@/components/score/ScoreVisuals";
 
 type Winner = WinnersResponse["winners"][number];
@@ -68,7 +68,14 @@ export function WinnersClient() {
       {error && <div className="mb-4"><Banner tone="error" onDismiss={() => setError(null)}>{error}</Banner></div>}
 
       {!data ? (
-        <div className="flex items-center gap-2 text-[13px] text-ink-400"><Spinner /> Loading your library…</div>
+        <>
+          <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[0, 1, 2, 3].map((i) => <StatSkeleton key={i} />)}
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {[0, 1, 2].map((i) => <Skeleton key={i} className="h-[300px]" />)}
+          </div>
+        </>
       ) : data.winners.length === 0 ? (
         <Empty title="Nothing saved yet" action={<a className="btn btn-primary" href="/studio">Open the studio</a>}>
           Score a pairing in the studio or the scorer, then save it here. Saved winners keep their full score so you
