@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+/* ───────────────────────────── Design tokens ─────────────────────────────
+   Dark-first: creators work in dark tools, and a dark chrome is also the only
+   honest backdrop for judging a thumbnail — a light UI makes every image look
+   more contrasty than it will on YouTube.                                   */
+
+@theme {
+  --color-ink-950: #06070c;
+  --color-ink-900: #0a0c14;
+  --color-ink-850: #0e111b;
+  --color-ink-800: #141826;
+  --color-ink-700: #1d2335;
+  --color-ink-600: #2a3147;
+  --color-ink-500: #3d4661;
+  --color-ink-400: #6b7490;
+  --color-ink-300: #98a0b8;
+  --color-ink-200: #c6ccdc;
+  --color-ink-100: #e8ebf3;
+
+  --color-brand-500: #ff3d57;
+  --color-brand-400: #ff6378;
+  --color-brand-600: #e01f3b;
+  --color-accent-500: #22d3ee;
+  --color-accent-400: #67e8f9;
+
+  --color-good-500: #22c55e;
+  --color-good-400: #4ade80;
+  --color-warn-500: #f59e0b;
+  --color-warn-400: #fbbf24;
+  --color-bad-500: #ef4444;
+  --color-bad-400: #f87171;
+
+  --font-sans: "InterVar", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+
+  --radius-xs: 6px;
+  --radius-sm: 9px;
+  --radius-md: 13px;
+  --radius-lg: 18px;
+  --radius-xl: 26px;
+}
+
+/* Overlay fonts, shared by the canvas editor and the server renderer so the
+   editor preview and the exported PNG use identical faces. */
+@font-face { font-family: 'TRDisplayBlack'; src: url('/fonts/InterDisplay-Black.otf') format('opentype'); font-weight: 900; font-display: block; }
+@font-face { font-family: 'TRDisplayXBold'; src: url('/fonts/InterDisplay-ExtraBold.otf') format('opentype'); font-weight: 800; font-display: block; }
+@font-face { font-family: 'TRGrotesk'; src: url('/fonts/Inter-Bold.otf') format('opentype'); font-weight: 700; font-display: block; }
+@font-face { font-family: 'TRGroteskMed'; src: url('/fonts/Inter-SemiBold.otf') format('opentype'); font-weight: 600; font-display: block; }
+@font-face { font-family: 'TRClassic'; src: url('/fonts/LiberationSans-Bold.ttf') format('truetype'); font-weight: 700; font-display: block; }
+@font-face { font-family: 'TRFriendly'; src: url('/fonts/Carlito-Bold.ttf') format('truetype'); font-weight: 700; font-display: block; }
+@font-face { font-family: 'TRUniversal'; src: url('/fonts/DejaVuSans-Bold.ttf') format('truetype'); font-weight: 700; font-display: block; }
+/* UI face */
+@font-face { font-family: 'InterVar'; src: url('/fonts/Inter-SemiBold.otf') format('opentype'); font-weight: 500 700; font-display: swap; }
+@font-face { font-family: 'InterVar'; src: url('/fonts/InterDisplay-ExtraBold.otf') format('opentype'); font-weight: 800 900; font-display: swap; }
+
+:root {
+  color-scheme: dark;
+}
+
+html, body {
+  background: var(--color-ink-950);
+  color: var(--color-ink-100);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-image:
+    radial-gradient(900px 500px at 12% -8%, rgba(255, 61, 87, 0.12), transparent 60%),
+    radial-gradient(800px 520px at 95% 0%, rgba(34, 211, 238, 0.1), transparent 62%);
+  background-attachment: fixed;
+}
+
+* { border-color: var(--color-ink-700); }
+
+::selection { background: rgba(255, 61, 87, 0.3); }
+
+/* Scrollbars that do not look like a 2012 admin panel. */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-ink-700); border-radius: 99px; border: 2px solid var(--color-ink-950); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-ink-600); }
+
+@layer components {
+  .panel {
+    background: color-mix(in oklab, var(--color-ink-900) 86%, transparent);
+    border: 1px solid var(--color-ink-700);
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(14px);
+  }
+
+  .panel-tight {
+    background: var(--color-ink-850);
+    border: 1px solid var(--color-ink-700);
+    border-radius: var(--radius-md);
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    border-radius: var(--radius-sm);
+    font-weight: 650; font-size: 0.875rem; line-height: 1;
+    padding: 0.65rem 1rem;
+    border: 1px solid transparent;
+    transition: background-color .14s ease, border-color .14s ease, transform .08s ease, opacity .14s ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn:active:not(:disabled) { transform: translateY(1px); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+  .btn-primary { background: var(--color-brand-500); color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: var(--color-brand-400); }
+
+  .btn-accent { background: var(--color-accent-500); color: #04121a; }
+  .btn-accent:hover:not(:disabled) { background: var(--color-accent-400); }
+
+  .btn-ghost { background: var(--color-ink-800); color: var(--color-ink-100); border-color: var(--color-ink-600); }
+  .btn-ghost:hover:not(:disabled) { background: var(--color-ink-700); }
+
+  .btn-quiet { background: transparent; color: var(--color-ink-300); }
+  .btn-quiet:hover:not(:disabled) { background: var(--color-ink-800); color: var(--color-ink-100); }
+
+  .btn-sm { padding: 0.4rem 0.7rem; font-size: 0.78rem; }
+
+  .field {
+    width: 100%;
+    background: var(--color-ink-950);
+    border: 1px solid var(--color-ink-600);
+    border-radius: var(--radius-sm);
+    padding: 0.7rem 0.85rem;
+    font-size: 0.9rem;
+    color: var(--color-ink-100);
+    outline: none;
+    transition: border-color .14s ease, box-shadow .14s ease;
+  }
+  .field:focus { border-color: var(--color-accent-500); box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.14); }
+  .field::placeholder { color: var(--color-ink-500); }
+
+  .label {
+    display: block;
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+    color: var(--color-ink-400); margin-bottom: 0.4rem;
+  }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    border-radius: 99px; padding: 0.22rem 0.6rem;
+    font-size: 0.7rem; font-weight: 650; letter-spacing: 0.02em;
+    border: 1px solid var(--color-ink-600); background: var(--color-ink-850); color: var(--color-ink-300);
+  }
+
+  .hairline { border-top: 1px solid var(--color-ink-700); }
+
+  /* Thumbnail cells keep YouTube's exact aspect so previews never mislead. */
+  .thumb { aspect-ratio: 16 / 9; object-fit: cover; background: var(--color-ink-800); }
+}
+
+@layer utilities {
+  .tabular { font-variant-numeric: tabular-nums; }
+  .text-balance { text-wrap: balance; }
+  .animate-in { animation: fade-up .3s cubic-bezier(.2,.7,.3,1) both; }
+  .shimmer {
+    background: linear-gradient(90deg, var(--color-ink-800) 25%, var(--color-ink-700) 50%, var(--color-ink-800) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.3s linear infinite;
+  }
+}
+
+@keyframes fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

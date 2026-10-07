@@ -1,0 +1,40 @@
+{
+  "name": "tuberadar-thumbnails",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TubeRadar Thumbnails — AI thumbnail + title optimisation module for the TubeRadar SaaS.",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start --port ${PORT:-3000}",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "smoke": "node --env-file-if-exists=.env.local scripts/smoke.mjs",
+    "verify": "npm run typecheck && npm run build"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
+    "@napi-rs/canvas": "^0.1.80",
+    "@supabase/ssr": "^0.7.0",
+    "@supabase/supabase-js": "^2.58.0",
+    "next": "16.4.0",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "sharp": "^0.34.3",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.13",
+    "@types/node": "^22.15.3",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "eslint": "^9.33.0",
+    "eslint-config-next": "16.4.0",
+    "playwright": "^1.63.0",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.9.2"
+  }
+}
